@@ -9,7 +9,7 @@ Todo = TypedDict('Todo', {
     'tags': Set[str],
 })
 
-def createTodo(content: str, deadline: date) -> Todo:
+def create_todo(content: str, deadline: date) -> Todo:
     if content == '':
         raise Exception('空の TODO を作成することはできません！')
 
@@ -24,20 +24,20 @@ def createTodo(content: str, deadline: date) -> Todo:
         'tags': set(),
     }
 
-def finishTodo(todo: Todo) -> Tuple[Todo, int]:
-    finised_todo = cast(Todo, {
+def finish_todo(todo: Todo) -> Tuple[Todo, int]:
+    finished_todo = cast(Todo, {
         **todo,
         'finish': datetime.now(),
     })
-    
-    expect_delta = getattr(finised_todo['deadline'] - finised_todo['start'], 'hours', 1)
-    actual_delta = getattr(finised_todo['finish'] - finised_todo['start'], 'hours', 1) # type: ignore[operator]
-    
+
+    expect_delta = getattr(finished_todo['deadline'] - finished_todo['start'], 'hours', 1)
+    actual_delta = getattr(finished_todo['finish'] - finished_todo['start'], 'hours', 1) # type: ignore[operator]
+
     ratio = int(actual_delta / expect_delta * 100)
-    
-    return (finised_todo, ratio)
-     
-def editDeadline(todo: Todo, deadline: date) -> Todo:
+
+    return (finished_todo, ratio)
+
+def edit_deadline(todo: Todo, deadline: date) -> Todo:
     if deadline <= datetime.now():
         raise Exception('過去の日付に TODO を編集することはできません！')
 
@@ -48,7 +48,7 @@ def editDeadline(todo: Todo, deadline: date) -> Todo:
 
     return edited_todo
 
-def addTag(todo: Todo, tag: str) -> Todo:
+def add_tag(todo: Todo, tag: str) -> Todo:
     if tag == '':
         raise Exception('空のタグを設定することはできません！')
 
@@ -59,19 +59,19 @@ def addTag(todo: Todo, tag: str) -> Todo:
         **todo,
         'tags': tags,
     })
- 
+
     return edited_todo
 
-def removeTag(todo: Todo, tag: str) -> Todo:
-    if tag in todo['tags']:
-        tags = set(todo['tags'])
-        tags.remove(tag)
-    
-        edited_todo = cast(Todo, {
-            **todo,
-            'tags': tags,
-        })
-    else:
+def remove_tag(todo: Todo, tag: str) -> Todo:
+    if tag not in todo['tags']:
         raise Exception('存在しないタグを削除しようとしました！')
+
+    tags = set(todo['tags'])
+    tags.remove(tag)
+
+    edited_todo = cast(Todo, {
+        **todo,
+        'tags': tags,
+    })
 
     return edited_todo
