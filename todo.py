@@ -1,5 +1,6 @@
 from typing import TypedDict, Set, Optional, Tuple, cast
-from datetime import datetime, date
+from datetime import datetime, timedelta, date
+
 
 Todo = TypedDict('Todo', {
     'content': str,
@@ -30,8 +31,8 @@ def finish_todo(todo: Todo) -> Tuple[Todo, int]:
         'finish': datetime.now(),
     })
 
-    expect_delta = getattr(finished_todo['deadline'] - finished_todo['start'], 'hours', 1)
-    actual_delta = getattr(finished_todo['finish'] - finished_todo['start'], 'hours', 1) # type: ignore[operator]
+    expect_delta = (finished_todo['deadline'] - finished_todo['start']) / timedelta(hours=1)
+    actual_delta = (finished_todo['finish'] - finished_todo['start'])  / timedelta(hours=1) # type: ignore[operator]
 
     ratio = int(actual_delta / expect_delta * 100)
 
