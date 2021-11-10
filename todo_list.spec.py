@@ -55,13 +55,25 @@ class TestTodoList(unittest.TestCase):
             todo_list = TodoList()
             todo_list.edit_todo(0, lambda todo: todo)
         
+    def test_getTodo(self):
+        todo_list = TodoList()
+        todo_list.create_todo('テスト 1', datetime.now() + timedelta(days=1))
+        todo_list.create_todo('テスト 2', datetime.now() + timedelta(days=2))
+        
+        self.assertEqual(todo_list.get_todo(0)['content'], 'テスト 1')
+
+    def test_getTodoRaisesInvalidIdError(self):
+        with self.assertRaises(Exception):
+            todo_list = TodoList()
+            todo_list.get_todo(0)
+
     def test_getTodos(self):
         todo_list = TodoList()
         todo_list.create_todo('テスト 1', datetime.now() + timedelta(days=1))
         todo_list.create_todo('テスト 2', datetime.now() + timedelta(days=2))
         
         self.assertEqual(len(todo_list.get_todos()), 2)
-        
+
     def test_getTodosWithTag(self):
         todo_list = TodoList()
         todo_list.create_todo('テスト 1', datetime.now() + timedelta(days=1))
