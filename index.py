@@ -1,11 +1,16 @@
 from datetime import datetime, timedelta
-from flask import Flask, request
+from flask import Flask, request, render_template
 from todo import Todo, edit_deadline, finish_todo, add_tag, remove_tag
 from todo_list import TodoList
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 todolist = TodoList()
+
+@app.route('/', methods=['GET'])
+def get_index():
+    return render_template('index.html')
 
 @app.route('/todolist', methods=['GET'])
 def get_todolist():
