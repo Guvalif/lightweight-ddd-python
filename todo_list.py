@@ -33,7 +33,7 @@ class TodoList():
     def get_todo(self, todo_id: int) -> Todo:
         if 0 <= todo_id < len(self._todos):
             return self._todos[todo_id]
-            
+
         else:
             raise Exception('存在しない TODO を取得しようとしました！')
 
