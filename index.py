@@ -12,6 +12,10 @@ todolist = TodoList()
 def get_index():
     return render_template('index.html')
 
+@app.route('/assets/<path:file_path>')
+def assets(file_path):
+    return app.send_static_file(file_path)
+
 @app.route('/todolist', methods=['GET'])
 def get_todolist():
     return str(todolist.get_todos())
