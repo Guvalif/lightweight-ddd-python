@@ -1,4 +1,4 @@
-from typing import TypedDict, Set, Optional, Tuple, cast
+from typing import TypedDict, List, Set, Optional, Tuple, cast
 from datetime import datetime, timedelta, date
 
 
@@ -76,3 +76,22 @@ def remove_tag(todo: Todo, tag: str) -> Todo:
     })
 
     return edited_todo
+
+TodoJson = TypedDict('TodoJson', {
+    'content': str,
+    'start': str,
+    'finish': Optional[str],
+    'deadline': str,
+    'tags': List[str],
+})
+
+def to_json(todo: Todo) -> TodoJson:
+    finish = todo['finish'].strftime('%Y/%m/%d %H:%M') if todo['finish'] is not None else None
+
+    return {
+        'content': todo['content'],
+        'start': todo['start'].strftime('%Y/%m/%d %H:%M'),
+        'finish': finish,
+        'deadline': todo['deadline'].strftime('%Y/%m/%d %H:%M'),
+        'tags': list(todo['tags']),
+    }

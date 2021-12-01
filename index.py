@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from flask import Flask, request, render_template
-from todo import Todo, edit_deadline, finish_todo, add_tag, remove_tag
+from flask.json import jsonify
+from todo import Todo, edit_deadline, finish_todo, add_tag, remove_tag, to_json
 from todo_list import TodoList
 
 app = Flask(__name__)
@@ -18,40 +19,48 @@ def assets(file_path):
 
 @app.route('/todolist', methods=['GET'])
 def get_todolist():
-    return str(todolist.get_todos())
+    return jsonify(
+        list(map(to_json, todolist.get_todos()))
+    )
 
 @app.route('/todolist', methods=['POST'])
 def post_todolist():
-    content = request.form['content']
+    content = request.json['content']
 
-    deadline = request.form['deadline']
+    deadline = request.json['deadline']
     deadline = datetime.strptime(deadline, '%Y/%m/%d %H:%M')
 
-    todo = todolist.create_todo(content, deadline)
+    todo_json = to_json(todolist.create_todo(content, deadline))
 
-    return str(todo)
+    return jsonify(todo_json)
 
 @app.route('/todo/<int:todo_id>', methods=['GET'])
 def get_todo(todo_id: int):
-    return str(todolist.get_todo(todo_id))
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))
+    )
 
 @app.route('/todo/<int:todo_id>', methods=['DELETE'])
 def delete_todo(todo_id: int):
     todolist.delete_todo(todo_id)
 
-    return str(todo_id)
+    return jsonify(todo_id)
 
 @app.route('/todo/<int:todo_id>/content', methods=['GET'])
 def get_todo_content(todo_id: int):
-    return str(todolist.get_todo(todo_id)['content'])
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))['content']
+    )
 
 @app.route('/todo/<int:todo_id>/deadline', methods=['GET'])
 def get_todo_deadline(todo_id: int):
-    return str(todolist.get_todo(todo_id)['deadline'])
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))['deadline']
+    )
 
 @app.route('/todo/<int:todo_id>/deadline', methods=['PUT'])
 def put_todo_deadline(todo_id: int):
-    deadline = request.form['deadline']
+    deadline = request.json['deadline']
     deadline = datetime.strptime(deadline, '%Y/%m/%d %H:%M')
 
     def editor(todo: Todo) -> Todo:
@@ -59,15 +68,19 @@ def put_todo_deadline(todo_id: int):
 
     todolist.edit_todo(todo_id, editor)
 
-    return str(deadline)
+    return jsonify(request.json['deadline'])
 
 @app.route('/todo/<int:todo_id>/start', methods=['GET'])
 def get_todo_start(todo_id: int):
-    return str(todolist.get_todo(todo_id)['start'])
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))['start']
+    )
 
 @app.route('/todo/<int:todo_id>/finish', methods=['GET'])
 def get_todo_finish(todo_id: int):
-    return str(todolist.get_todo(todo_id)['finish'])
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))['finish']
+    )
 
 @app.route('/todo/<int:todo_id>/finish', methods=['POST'])
 def post_todo_finish(todo_id: int):
@@ -81,32 +94,34 @@ def post_todo_finish(todo_id: int):
 
     todolist.edit_todo(todo_id, editor)
 
-    return str(ratio)
+    return jsonify(ratio)
 
 @app.route('/todo/<int:todo_id>/tags', methods=['GET'])
 def get_todo_tags(todo_id: int):
-    return str(todolist.get_todo(todo_id)['tags'])
+    return jsonify(
+        to_json(todolist.get_todo(todo_id))['tags']
+    )
 
 @app.route('/todo/<int:todo_id>/tags', methods=['POST'])
 def post_todo_tags(todo_id: int):
-    tag = request.form['tag']
+    tag = request.json['tag']
 
     def editor(todo: Todo) -> Todo:
         return add_tag(todo, tag)
 
     todolist.edit_todo(todo_id, editor)
 
-    return str(tag)
+    return jsonify(tag)
 
 @app.route('/todo/<int:todo_id>/tags', methods=['DELETE'])
 def delete_todo_tags(todo_id: int):
-    tag = request.form['tag']
+    tag = request.json['tag']
 
     def editor(todo: Todo) -> Todo:
         return remove_tag(todo, tag)
 
     todolist.edit_todo(todo_id, editor)
 
-    return str(tag)
+    return jsonify(tag)
 
 app.run(host='0.0.0.0', port=80)
