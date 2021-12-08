@@ -1,3 +1,4 @@
+from os import environ
 from datetime import datetime, timedelta
 from flask import Flask, request, render_template
 from flask.json import jsonify
@@ -124,4 +125,4 @@ def delete_todo_tags(todo_id: int):
 
     return jsonify(tag)
 
-app.run(host='0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)))
